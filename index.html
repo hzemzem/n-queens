@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>N-Queens</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #ccccff;
+            text-align: center;
+        }
+        
+        body,
+        p,
+        input,
+        button,
+        a,
+        div,
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Big Shoulders Display', cursive;
+        }
+        
+        button,
+        input {
+            font-size: 20px;
+        }
+        
+        .output-box {
+            margin: auto;
+            display: block;
+            max-width: auto;
+        }
+        
+        h1 {
+            font-size: 50px;
+        }
+        
+        p {
+            font-size: 30px;
+        }
+        
+        .input-box {
+            text-align: center;
+        }
+        
+        h3 {
+            color: red;
+            font-size: 30px;
+        }
+        
+        .square {
+            padding: 0.2rem;
+            float: left;
+            border: 1px solid #000;
+            width: 2rem;
+            height: 2rem;
+        }
+        
+        .queen {
+            text-align: center;
+            font-size: 25px;
+        }
+        
+        .row-empty {
+            display: block;
+            width: 100%;
+            float: right;
+        }
+        
+        #output-div {
+            float: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>N-Queens Problen</h1>
+    <div class="input-box">
+        <p>Please Enter a number equal to or greater than 8</p>
+        <input class="num-input" type="text"> <button id="btn">Enter</button>
+    </div>
+    <break></break>
+    <break></break>
+    <div class="output-box">
+        <div id="output-div"></div>
+    </div>
+
+    <script type="text/javascript">
+        let counter = 0; // keep track of number of iterations performed
+        let num = 0;
+
+        // looping through nodes to check for vulnerabities to avoid queens attacking each other
+        let vulnerableQueen = function(totalCols) {
+            let length = totalCols.length;
+            let currentNode = length - 2;
+            let lastNode = totalCols[length - 1];
+
+            while (currentNode >= 0) {
+                if (totalCols[currentNode] === lastNode) return true;
+                if (lastNode - (length - 1) === totalCols[currentNode] - currentNode) return true;
+                if (lastNode + (length - 1) === totalCols[currentNode] + currentNode) return true;
+                currentNode--;
+            }
+
+            return false;
+        }
+
+        // function to display results which calls the render function for dom rendering
+        let displayResult = function(totalCols) {
+            let num = totalCols.length;
+            let row = 0;
+            let column = 0;
+
+            let char = '';
+            while (row < num) {
+                while (column < num) {
+                    totalCols[row] === column ? char = 'Q' : char = '*';
+                    renderElements(char);
+                    column++;
+                }
+
+                char = '\n';
+                renderElements(char);
+                column = 0;
+                row++;
+            }
+        }
+
+        // function to render results in the dom using jQuery
+        let renderElements = function(character) {
+            let el = '';
+
+            // based on the character returned, building the element to append
+            if (character === 'Q') {
+                el = '<div class="square queen">♛</div>';
+            } else if (character === '*') {
+                el = '<div class="square empty"></div>';
+            } else if (character === '\n') {
+                el = '<div class="row-empty"></div>';
+            }
+
+            $("#output-div").append(el);
+        }
+
+
+        // function to check where to place queens
+        let placeQueen = function(totalNum, numQueens, cols) {
+            if (numQueens === 0) return cols;
+
+            cols = cols || [];
+
+            for (let i = 0; i < totalNum; i++) {
+                cols.push(i);
+                counter++;
+
+                // 
+                if (!vulnerableQueen(cols) && placeQueen(totalNum, numQueens - 1, cols)) {
+                    return cols;
+                }
+
+                cols.pop(i);
+            }
+
+            return;
+        }
+
+        // click event to capture user input of N 
+        $("button").click(function() {
+            //empty previously displayed results
+            $("#output-div").empty();
+            // capture user input
+            num = $('.num-input').val();
+            // make sure number entered is equal to or greater than 8 per the requirements
+            if (num < 8) {
+                // display message to the user letting them know of the wrong input
+                $("#output-div").append('<h3>Wrong Input!!!</h3>')
+                return;
+            }
+
+            // sending the number entered to the funtion to check where to place queens
+            displayResult(placeQueen(num, num));
+        });
+    </script>
+
+</body>
+
+</html>
